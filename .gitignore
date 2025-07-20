@@ -1,0 +1,16 @@
+# Entorno virtual
+venv/
+.env/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# Archivos de sistema
+.DS_Store
+
+*.png
+*.keras
+*.h5
