@@ -23,10 +23,14 @@ def crear_modelo_alice(bits, n_destinatarios):
     x = Concatenate()([input_msg, input_dst])
 
     # Capas ocultas que permiten aprender una función de cifrado
-    x = Dense(256, activation='relu')(x)
+    # x = Dense(256, activation='relu')(x)
+    # x = Dense(128, activation='relu')(x)
+    # x = Dense(64, activation='tanh')(x)
+    # x = Dense(32, activation='sigmoid')(x)
+
     x = Dense(128, activation='relu')(x)
-    x = Dense(64, activation='tanh')(x)
-    x = Dense(32, activation='sigmoid')(x)
+    x = Dense(64, activation='relu')(x)
+
     # Lineal para preservar el cifrado. L2 ayuda a evitar el overfitting
     cifrado = Dense(bits, activation='linear',
                     kernel_regularizer=l2(0.01),

@@ -63,8 +63,6 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
         loss_charlie_sobre_bob = bce(mensajes_batch, reconstruido_charlie_sobre_bob).numpy()
         loss_non_dst = (loss_bob_sobre_charlie + loss_charlie_sobre_bob) / 2
 
-
-
         # Cálculo de pérdida total con pesos ajustables
         # Ajustable con parámetros y se recompensa:
         # que Bob y Charlie lo hagan bien
@@ -72,9 +70,9 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
         # se penaliza que:
         # Eve logre descifrar mensajes
         # el destinatario incorrecto descifre bien
-        loss_total = (gamma * (loss_bob + loss_charlie) / 2 +
-                      beta * (1 - loss_non_dst) -
-                      alfa * loss_eve)
+
+        loss_total = gamma * ((loss_bob + loss_charlie)/2) + beta * loss_non_dst - alfa * loss_eve
+
 
         registrar_pérdidas(historial,
                         loss_bob,

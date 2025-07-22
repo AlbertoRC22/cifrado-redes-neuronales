@@ -28,11 +28,11 @@ def guardar_si_mejora(loss_total, historial, alice, bob, charlie):
         alice.save('modelo_alice.keras')
         bob.save('modelo_bob.keras')
         charlie.save('modelo_charlie.keras')
-        print("💾 Modelos guardados (mejor pérdida ajustada).")
+        print("Modelos guardados (mejor pérdida ajustada).")
 
 # Generar gráfico final con pérdida no destinatario
 def graficar_historial(historial, ruta='grafico_perdidas.png'):
-    print("\n📈 Generando gráfico de pérdidas...")
+    print("\nGenerando gráfico de pérdidas...")
     plt.figure(figsize=(10, 6))
     plt.plot(historial['bob'], label='Bob')
     plt.plot(historial['charlie'], label='Charlie')
@@ -47,4 +47,4 @@ def graficar_historial(historial, ruta='grafico_perdidas.png'):
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(ruta)
-    print(f"✅ Gráfico guardado como '{ruta}'")
+    print(f"\nGráfico guardado como '{ruta}'")

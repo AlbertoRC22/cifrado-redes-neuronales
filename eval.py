@@ -59,7 +59,4 @@ def evaluar(bits, muestras):
         print(f"Charlie sobre Bob -> {charlie_wrong} | Precisión indebida: {acc_wrong_charlie:.2f}")
         print(f"Eve sobre Bob -----> {eve_bob_out} | Precisión: {acc_eve_bob:.2f}")
         print(f"Eve sobre Charlie -> {eve_charlie_out} | Precisión: {acc_eve_charlie:.2f}")
-        print("-" * 50)
-
-if __name__ == "__main__":
-    evaluar()
+        print("-" * 70)
