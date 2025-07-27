@@ -11,10 +11,12 @@ def evaluar(bits, muestras):
     charlie = crear_modelo_charlie(bits)
     eve = crear_modelo_eve(bits)
 
+    # Se cargan los pesos de los modelos
     alice.load_weights('modelo_alice.keras')
     bob.load_weights('modelo_bob.keras')
     charlie.load_weights('modelo_charlie.keras')
 
+    # Se diferencian destinatarios con etiquetas [1, 0] y [0, 1]
     mensajes = generar_mensajes(n=muestras, bits=bits)
     dst_bob = np.tile([1, 0], (muestras, 1))
     dst_charlie = np.tile([0, 1], (muestras, 1))

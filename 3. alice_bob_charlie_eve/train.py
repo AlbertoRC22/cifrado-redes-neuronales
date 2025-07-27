@@ -34,8 +34,8 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
     bce = BinaryCrossentropy()
 
     for epoch in range(epochs):
+
         idx = np.random.permutation(len(mensajes))
-        # Se escoge un batch aleatorio para evitar overfitting correlaciones
         mensajes_batch = mensajes[idx[:batch_size]]
 
         # Se replican las etiquetas en cada batch
@@ -51,6 +51,7 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
         cifrado_para_charlie = alice.predict([mensajes_batch, dst_charlie])
 
         # Eve intenta interceptar los mensajes de Bob y charlie
+        # Los apila con vtsack y también tiene los mensaje normales, duplicados para que cuadre
         loss_eve = eve.train_on_batch(np.vstack([cifrado_para_bob, cifrado_para_charlie]),
                                       np.vstack([mensajes_batch, mensajes_batch]))
 
@@ -58,7 +59,7 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
         reconstruido_bob_sobre_charlie = bob.predict(cifrado_para_charlie)
         reconstruido_charlie_sobre_bob = charlie.predict(cifrado_para_bob)
 
-        # Pérdida de receptores no destinatarios ???
+        # Se calula la pérdida cruzada, de cuando no es el destinatario
         loss_bob_sobre_charlie = bce(mensajes_batch, reconstruido_bob_sobre_charlie).numpy()
         loss_charlie_sobre_bob = bce(mensajes_batch, reconstruido_charlie_sobre_bob).numpy()
         loss_non_dst = (loss_bob_sobre_charlie + loss_charlie_sobre_bob) / 2
