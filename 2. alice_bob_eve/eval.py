@@ -32,17 +32,17 @@ def evaluar(bits, muestras):
     for i in range(muestras):
         original = mensajes[i].astype(int)
 
-        reconstruidos_bob = (reconstruidos_bob[i] > 0.5).astype(int)
+        reconstruidos_b = (reconstruidos_bob[i] > 0.5).astype(int)
         reconstruidos_e = (reconstruidos_eve[i] > 0.5).astype(int)
 
-        precicion_bob = np.mean(original == reconstruidos_bob)
+        precicion_bob = np.mean(original == reconstruidos_b)
         precicion_eve = np.mean(original == reconstruidos_e)
 
-        hamming_b = np.sum(original != reconstruidos_bob)
+        hamming_b = np.sum(original != reconstruidos_b)
         hamming_e = np.sum(original != reconstruidos_e)
 
         print(f"[{i+1}] Original  --> {original}")
-        print(f"     Bob       --> {reconstruidos_bob}   | Precisión: {precicion_bob:.2f} | Hamming: {hamming_b}")
+        print(f"     Bob       --> {reconstruidos_b}   | Precisión: {precicion_bob:.2f} | Hamming: {hamming_b}")
         print(f"     Eve       --> {reconstruidos_e}   | Precisión: {precicion_eve:.2f} | Hamming: {hamming_e}")
         print("-" * 60)
 

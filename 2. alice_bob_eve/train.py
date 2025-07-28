@@ -32,7 +32,7 @@ def entrenar(bits, epochs, batch_size, gamma, entrenamiento_conjunto):
         cifrado, mensajes_batch = entrenar_individual(alice, bob, mensajes, bits, epochs, batch_size)
 
     # En ambos casos, Eve ataca
-    atacar_con_eve(eve, cifrado, mensajes_batch, epochs)
+    atacar_con_eve(eve, cifrado, mensajes_batch, epochs, batch_size)
 
 def entrenar_conjunto(alice, bob, eve, mensajes, bits, epochs, batch_size, gamma):
     bce = BinaryCrossentropy()
@@ -119,13 +119,11 @@ def entrenar_individual(alice, bob, mensajes, bits, epochs, batch_size):
     print("Entrenamiento Alice/Bob finalizado")
     return cifrado, batch_mensajes
 
-def atacar_con_eve(eve, cifrado, mensajes, epochs):
+def atacar_con_eve(eve, cifrado, mensajes, epochs, batch_size):
     print("Entrenando EVE para atacar SIN CLAVES...")
     # Se compila a Eve porque es la que se va a entrenar ahora
     eve.compile(optimizer=Adam(1e-3), loss='binary_crossentropy')
 
-    # En este caso, con 
-    batch_size = len(mensajes)
 
     for epoch in range(epochs):
         t0 = time.time()
