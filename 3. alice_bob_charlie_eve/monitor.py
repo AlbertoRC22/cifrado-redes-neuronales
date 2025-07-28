@@ -13,7 +13,6 @@ def inicializar_historial():
         'mejor_perdida': np.inf
     }
 
-# Se añaden las pérdidas correspondientes
 def registrar_pérdidas(historial, loss_bob, loss_charlie, loss_eve, loss_non_dst, loss_total):
     historial['bob'].append(loss_bob)
     historial['charlie'].append(loss_charlie)
@@ -21,7 +20,6 @@ def registrar_pérdidas(historial, loss_bob, loss_charlie, loss_eve, loss_non_ds
     historial['non_dst'].append(loss_non_dst)
     historial['total'].append(loss_total)
 
-# Guardar modelos si mejora la pérdida ajustada
 def guardar_si_mejora(loss_total, historial, alice, bob, charlie):
     if loss_total < historial['mejor_perdida']:
         historial['mejor_perdida'] = loss_total
@@ -30,7 +28,6 @@ def guardar_si_mejora(loss_total, historial, alice, bob, charlie):
         charlie.save('modelo_charlie.keras')
         print("Modelos guardados (mejor pérdida ajustada).")
 
-# Generar el gráfico final
 def graficar_historial(historial, ruta='grafico_perdidas.png'):
     print("\nGenerando gráfico de pérdidas...")
     plt.figure(figsize=(10, 6))

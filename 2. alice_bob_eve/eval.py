@@ -79,5 +79,5 @@ def evaluar(bits, muestras):
         accs_bob_errado.append(acc_err)
         dist_bob_errado.append(hamming_err)
 
-    print("\n📉 RESULTADOS CON CLAVES ERRÓNEAS\n")
+    print("\nRESULTADOS CON CLAVES ERRÓNEAS\n")
     print(f"Bob → Precisión media (clave errada): {np.mean(accs_bob_errado):.4f} | Hamming media: {np.mean(dist_bob_errado):.2f}")

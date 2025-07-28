@@ -43,5 +43,5 @@ def evaluar(bits, muestras):
     
     media_precision = np.mean(precisiones)
     media_distancias = np.mean(distancias)
-    print(f"\n✅ Precisión promedio: {media_precision:.4f}")
-    print(f"🔢 Distancia de Hamming media: {media_distancias:.4f} (de {bits} bits)")
+    print(f"\nPrecisión promedio: {media_precision:.4f}")
+    print(f"Distancia de Hamming media: {media_distancias:.4f} (de {bits} bits)")

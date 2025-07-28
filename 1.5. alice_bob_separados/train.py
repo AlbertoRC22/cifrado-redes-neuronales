@@ -8,13 +8,13 @@ def entrenar(bits, epochs, batch_size):
     n_mensajes = 10000
 
     # S gener auna clave para cifrar todos los mensajes, ya que se entrenan por separado
-    print("🔐 Usando clave fija")
+    print("Usando clave fija")
     clave_fija = np.random.randint(0, 2, size=(1, bits)).astype(np.float32)
 
-    print("🚀 Generando mensajes")
+    print("Generando mensajes")
     mensajes = generar_mensajes(n_mensajes, bits)
 
-    print("🧠 Entrenando ALICE")
+    print("Entrenando ALICE")
     alice = crear_modelo_alice(bits, key=True)
     alice.compile(optimizer=Adam(0.001), loss=BinaryCrossentropy())
 
@@ -26,16 +26,16 @@ def entrenar(bits, epochs, batch_size):
         cifrados_batch = alice.predict([mensajes_batch, claves_batch])  # inicialización
         alice.train_on_batch([mensajes_batch, claves_batch], cifrados_batch)
 
-        print(f"Época {epoch+1} Alice ✅")
+        print(f"Época {epoch+1} Alice")
 
-    print("💾 Guardando modelo de Alice")
+    print("Guardando modelo de Alice")
     alice.save("modelo_alice_separado.keras")
 
-    print("🔄 Generando cifrados con Alice entrenada")
+    print("Generando cifrados con Alice entrenada")
     claves_completas = np.repeat(clave_fija, n_mensajes, axis=0)
     cifrados = alice.predict([mensajes, claves_completas])
 
-    print("🧠 Entrenando BOB")
+    print("Entrenando BOB")
     bob = crear_modelo_bob(bits, key=True)
     bob.compile(optimizer=Adam(0.001), loss=BinaryCrossentropy())
 
@@ -53,5 +53,5 @@ def entrenar(bits, epochs, batch_size):
         acc = np.mean((reconstruidos > 0.5).astype(int) == mensajes_batch)
         print(f"Época {epoch+1} Bob - Precisión del descifrado: {acc:.3f}")
 
-    print("💾 Guardando modelo de Bob")
+    print("Guardando modelo de Bob")
     bob.save("modelo_bob_separado.keras")

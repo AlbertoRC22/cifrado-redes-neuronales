@@ -19,7 +19,7 @@ def calcular_precision(salida, original):
     return np.mean(salida == original.astype(int))
 
 def entrenar(bits, epochs, batch_size, gamma, entrenamiento_conjunto):
-    print("📦 Generando mensajes")
+    print("Generando mensajes")
     mensajes = generar_mensajes(10000, bits)
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
@@ -80,9 +80,9 @@ def entrenar_conjunto(alice, bob, eve, mensajes, bits, epochs, batch_size, gamma
             alice.save("modelo_alice.keras")
             bob.save("modelo_bob.keras")
             eve.save("modelo_eve_entrenada.keras")
-            print("💾 Modelos guardados")
+            print("Modelos guardados")
 
-    print("✅ Entrenamiento conjunto terminado")
+    print("Entrenamiento conjunto terminado")
     return cifrado, batch_mensajes
 
 def entrenar_individual(alice, bob, mensajes, bits, epochs, batch_size):
@@ -114,7 +114,7 @@ def entrenar_individual(alice, bob, mensajes, bits, epochs, batch_size):
             mejor_loss = loss
             alice.save("modelo_alice.keras")
             bob.save("modelo_bob.keras")
-            print("💾 Modelos guardados")
+            print("Modelos guardados")
 
     print("Entrenamiento Alice/Bob finalizado")
     return cifrado, batch_mensajes
