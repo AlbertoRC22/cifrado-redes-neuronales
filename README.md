@@ -3,16 +3,17 @@ Este es un proyecto que ilustra diferentes escenarios posibles en el campo de la
 1. Alice y Bob
 
 En este caso se modela el caso de dos agentes honestos: Alice y Bob. Alice es el agente que cifra los mensajes para que Bob los descifre.
-Ilustra el caso en el que entrenan juntos y no hay atacante, con dos opciones posibles: cifrar con o sin clave.
 
-1.5. Alice y Bob por separado
+Hay tres casos:
 
-En este caso se ilustra la difcultad que entraña cifrar sin juntar los modelos de redes neuronales. Aún utilizando una sola clave, como Alice y Bob no aparenden a cifrar y descifrar el uno para el otro, Bob no consigue tener una precisión mayor al 50%.
+    - el 1.1 trata de Alice y Bob cifrando y descifrando sin clave.
+    - el 1.2 trata de Alice y Bob cifrando y descifrando con clave.
+    - el 1.3 trata de Alice y Bob cifrando y descifrando, pero entrenados de forma separada.
 
 2. Alice y Bob con atacante
 
-Modela dos situaciones: El atacante, en este caso es Eve, entrena con Alice y Bob o ataca por su cuenta, obteniendo precisiones diferentes en el descifrado, mientras que Bob descifra bien los mensajes en ambos escenarios.
-   
-3. Alice, Bob, Charlie e Eve
-
-En este caso, se ha añadido un agente honesto más e Eve, sin éxito, intenta descifrar los mensajes estando en el entrenamiento con ellos. Con un buen uso de las funciones de pérdida, podemos conseguir que el atacante no pueda romper el cifrado de las partes honestas.
+En este caso se modelan varios escenarios de Alice y Bob con un atacante:
+ 
+    - 2.1 Alice Y Bob entrenan junto a Eve
+    - 2.2 Alice y Bob no entrenan junto a Eve
+    - 2.3 Alice y Bob entrenan junto a Eve, ademmás de Eve otra vez por separado, pero la función de pérdida ignora a Eve

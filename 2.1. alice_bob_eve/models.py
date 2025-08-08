@@ -22,6 +22,7 @@ def crear_modelo_bob(bits):
     
     
     x = Dense(64, activation='relu')(x)
+    x = Dropout(0.2)(x)
     x = Dense(64, activation='relu')(x)
     reconstruido = Dense(bits, activation='sigmoid')(x)
     return Model(final_input, reconstruido, name='Bob')
