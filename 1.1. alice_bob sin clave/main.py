@@ -9,7 +9,7 @@ if __name__ == '__main__':
     n_mensajes = 10000
     bits = 32
     batch_size = 512
-    adam_optimizer = 0.01
+    adam_optimizer = 0.00000001
     muestras = 10
     
     epochs = 300
