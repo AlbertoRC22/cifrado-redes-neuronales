@@ -3,11 +3,11 @@ from data_utils import generar_mensajes
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
+import time as t
 
-def entrenar(bits, epochs, batch_size):
-    n_mensajes = 10000
+def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
 
-    # S gener auna clave para cifrar todos los mensajes, ya que se entrenan por separado
+    # Se genera una clave para cifrar todos los mensajes, ya que se entrenan por separado
     print("Usando clave fija")
     clave_fija = np.random.randint(0, 2, size=(1, bits)).astype(np.float32)
 
@@ -16,8 +16,9 @@ def entrenar(bits, epochs, batch_size):
 
     print("Entrenando ALICE")
     alice = crear_modelo_alice(bits, key=True)
-    alice.compile(optimizer=Adam(0.001), loss=BinaryCrossentropy())
+    alice.compile(optimizer=Adam(adam_optimizer), loss=BinaryCrossentropy())
 
+    time_0 = t.time()
     for epoch in range(epochs):
         idx = np.random.choice(n_mensajes, batch_size)
         mensajes_batch = mensajes[idx]
@@ -37,7 +38,7 @@ def entrenar(bits, epochs, batch_size):
 
     print("Entrenando BOB")
     bob = crear_modelo_bob(bits, key=True)
-    bob.compile(optimizer=Adam(0.001), loss=BinaryCrossentropy())
+    bob.compile(optimizer=Adam(adam_optimizer), loss=BinaryCrossentropy())
 
     for epoch in range(epochs):
         idx = np.random.choice(n_mensajes, batch_size)
@@ -55,3 +56,6 @@ def entrenar(bits, epochs, batch_size):
 
     print("Guardando modelo de Bob")
     bob.save("modelo_bob_separado.keras")
+
+    time = t.time() - time_0
+    return time

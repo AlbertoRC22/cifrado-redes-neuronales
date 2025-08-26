@@ -5,10 +5,10 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
+import time as t
 
-def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
+def entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma):
     
-    n_mensajes = 10000
     adam_optimizer_rate = 0.001
     print("GENERANDO MENSAJES")
     mensajes = generar_mensajes(n_mensajes, bits)
@@ -48,6 +48,7 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
 
     mejor_loss = float('inf')
 
+    time_0 = t.time()
     for epoch in range(epochs):
         
         idx = np.random.permutation(n_mensajes)[:batch_size]
@@ -84,6 +85,7 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
         precision_eve = np.mean((eve.predict(cifrado_batch) > 0.5).astype(int) == mensajes_batch)
 
         print(
+            f"EPOCHS TOTALES = {epochs} |"
             f"[Epoch {epoch+1:03}] | "
             f"Bob_ok={precision_bob:.3f} | "
             f"Bob_err={precision_errores:.3f} | "
@@ -92,3 +94,5 @@ def entrenar(bits, epochs, batch_size, alfa, beta, gamma):
             f"loss_bob_errores={loss_bob_errores:.4f} | "
             f"loss_eve={loss_eve:.4f} | "
         )
+    time = t.time() - time_0
+    return time

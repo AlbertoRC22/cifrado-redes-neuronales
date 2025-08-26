@@ -7,9 +7,8 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 import time as time
 
-def entrenar(bits, epochs, batch_size, beta, gamma):
-    
-    n_mensajes = 10000
+def entrenar(n_mensajes, bits, epochs, batch_size, beta, gamma):
+
     adam_optimizer_rate = 0.001
     print("GENERANDO MENSAJES")
     mensajes = generar_mensajes(n_mensajes, bits)
@@ -52,6 +51,7 @@ def entrenar(bits, epochs, batch_size, beta, gamma):
     cifrados_para_eve = []
     mensajes_batch_para_eve = []
 
+    tiempo_inicial = time.time()
     for epoch in range(epochs):
         
         idx = np.random.permutation(n_mensajes)[:batch_size]
@@ -113,3 +113,5 @@ def entrenar(bits, epochs, batch_size, beta, gamma):
               f"loss_eve={loss_eve:.4f} | "
               f"TIME={(time.time() - time_0):.4f}]")
 
+    tiempo_total = time.time() - tiempo_inicial
+    return tiempo_total
