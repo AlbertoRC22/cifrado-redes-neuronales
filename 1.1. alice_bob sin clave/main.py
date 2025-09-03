@@ -9,17 +9,39 @@ if __name__ == '__main__':
     n_mensajes = 10000
     bits = 32
     batch_size = 512
-    adam_optimizer = 0.00000001
+    adam_optimizer = 0.001
     muestras = 10
     
-    epochs = 300
     step = 300
     total_epochs = 6000
 
-    res_file_name = f"Resultados_11_{batch_size}_{adam_optimizer}.txt"
-    nombre_figura = f"Figura 11 - {batch_size} y {adam_optimizer}"
-    with open(res_file_name, "w") as f:
-        f.write("-- RESULTADOS DEL EXPERIMENTO 1.1. --\n\n")
+    n_ejecuciones = 3
+    nombre_figura_base = f"Figura 11 - {batch_size}"
+
+    for i in range(0, n_ejecuciones):
+        epochs = 300
+
+        if (i == 0):
+            adam_optimizer_act = adam_optimizer / (10 ** i)
+            nombre_figura = nombre_figura_base + f" y {adam_optimizer_act}"
+            
+            res_file_name = f"Resultados_11_{batch_size}_{adam_optimizer_act}.txt"
+            with open(res_file_name, "w") as f:
+                f.write("-- RESULTADOS DEL EXPERIMENTO 1.1. --\n\n")
+        elif (i == 1):
+            adam_optimizer_act = adam_optimizer / (10 ** i)
+            nombre_figura = nombre_figura_base + f" y {adam_optimizer_act}"
+            
+            res_file_name = f"Resultados_11_{batch_size}_{adam_optimizer_act}.txt"
+            with open(res_file_name, "w") as f:
+                f.write("-- RESULTADOS DEL EXPERIMENTO 1.1. --\n\n")
+        else:
+            adam_optimizer_act = adam_optimizer / (10 ** i)
+            nombre_figura = nombre_figura_base + f" y {adam_optimizer_act}"
+            
+            res_file_name = f"Resultados_11_{batch_size}_{adam_optimizer_act}.txt"
+            with open(res_file_name, "w") as f:
+                f.write("-- RESULTADOS DEL EXPERIMENTO 1.1. --\n\n")
             
 
         diccionario_medidas = {
@@ -34,7 +56,7 @@ if __name__ == '__main__':
             f.write(f"Número de mensajes = {n_mensajes}\n")
             f.write(f"Número de bits = {bits}\n")
             f.write(f"Tamaño del batch = {batch_size}\n")
-            f.write(f"Adam optimizer learning rate = {adam_optimizer}\n")
+            f.write(f"Adam optimizer learning rate = {adam_optimizer_act}\n")
             f.write(f"Epochs totales = {total_epochs}\n")
             f.write(f"Epochs iniciales = {epochs}\n")
             f.write("\n")

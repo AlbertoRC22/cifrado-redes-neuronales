@@ -98,6 +98,6 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
     with open(res_file_name, "a") as f:
         f.write("\nRESULTADOS CON CLAVES ERRÓNEAS\n\n")
         f.write(f"Bob -> Precisión media (clave errada): {media_precision_errores:.4f} | Hamming media: {media_distancia_errores:.2f}\n")
-        f.write(f"Bob -> Reconstrucciones perfectas (con clave errada): {reconstrucciones_perfectas_errores}")
+        f.write(f"Bob -> Reconstrucciones perfectas (con clave errada): {reconstrucciones_perfectas_errores}\n\n\n")
     
     return [media_precision, media_distancias, reconstrucciones_perfectas, media_precision_errores, media_distancia_errores, reconstrucciones_perfectas_errores]

@@ -5,20 +5,34 @@ import time as t
 
 if __name__ == '__main__':
 
-    res_file_name = "Resultados_21.txt"
+    nombre_figura = "21 - 512 y 0,001 cada 500"
+
+    res_file_name = f"Resultados de {nombre_figura}.txt"
     with open(res_file_name, "w") as f:
-        f.write("-- RESULTS FROM EXPERIMENT 2.1. --\n\n")
+        f.write("-- RESULTADOS DEL EXPERIMENTO 2.1. --\n\n")
 
     n_mensajes = 10000
     bits = 32
-    epochs = 300
-    step = 300
-    total_epochs = 900
-    batch_size = 128
+    epochs = 500
+    step = 500
+    total_epochs = 6000
+    batch_size = 512
+    adam_optimizer = 0.001
     alfa = 1.0
     beta = 2.0
     gamma = 7.0
     muestras = 10
+
+    with open(res_file_name, "a") as f:
+        f.write(f"Número de mensajes = {n_mensajes}\n")
+        f.write(f"Número de bits = {bits}\n")
+        f.write(f"Tamaño del batch = {batch_size}\n")
+        f.write(f"Adam optimizer learning rate = {adam_optimizer}\n")
+        f.write(f"Epochs totales = {total_epochs}\n")
+        f.write(f"Epochs iniciales = {epochs}\n")
+        f.write(f"alfa = {alfa}\n")
+        f.write(f"beta = {beta}\n")
+        f.write(f"gamma = {gamma}\n")
 
     diccionario_medidas = {
         "epochs": [],
@@ -37,7 +51,7 @@ if __name__ == '__main__':
     
     time_0 = t.time()
     while epochs <= total_epochs:
-        training_time = entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma)
+        training_time = entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer, alfa, beta, gamma)
         
         res_list = evaluar(n_mensajes, bits, muestras, epochs, res_file_name)
 
@@ -69,7 +83,9 @@ if __name__ == '__main__':
         epochs += step
     
     total_time = t.time() - time_0
-    print(total_time)
+    with open(res_file_name, "a") as f:
+        f.write(f"\nTiempo total de ejecución (s): {total_time}\n")
+        f.write(f"Tiempo total de ejecución (mins): {total_time/60}")
 
-    draw_graph(diccionario_medidas)
+    draw_graph(diccionario_medidas, n_mensajes, nombre_figura)
     

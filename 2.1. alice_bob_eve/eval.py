@@ -12,7 +12,7 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
     # Se cargan los pesos del entrenamiento anterior
     alice.load_weights('modelo_alice.keras')
     bob.load_weights('modelo_bob.keras')
-    eve.load_weights('modelo_eve_entrenada.keras')
+    eve.load_weights('modelo_eve.keras')
 
     mensajes = generar_mensajes(n_mensajes, bits).astype(np.float32)
     claves = np.random.randint(0, 2, size=(mensajes.shape[0], bits)).astype(np.float32)
@@ -66,9 +66,9 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
             reconstrucciones_perfectas_eve += 1
 
     media_precisiones_bob = np.mean(precisiones_bob)
-    media_precisiones_eve = np.mean(np.mean(precisiones_eve))
-    media_distancias_bob = np.mean(np.mean(dist_bob))
-    media_distancias_eve = np.mean(np.mean(dist_eve))
+    media_precisiones_eve = np.mean(precisiones_eve)
+    media_distancias_bob = np.mean(dist_bob)
+    media_distancias_eve = np.mean(dist_eve)
     str_titulo = "\nRESULTADOS FINALES\n\n"
     str_precision_bob = f"Bob -> Precisión media: {media_precisiones_bob:.4f} | Hamming media: {media_distancias_bob:.2f}\n"
     str_precision_eve = f"Eve -> Precisión media: {media_precisiones_eve:.4f} | Hamming media: {media_distancias_eve:.2f}\n"
@@ -107,7 +107,7 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
         precisiones_bob_errado.append(acc_err)
         distancias_bob_errado.append(hamming_err)
 
-        if(distancias_bob_errado == 0):
+        if(hamming_err == 0):
             reconstrucciones_perfectas_errado += 1
 
     media_precisiones_bob_errado = np.mean(precisiones_bob_errado)

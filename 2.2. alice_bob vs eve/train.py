@@ -7,9 +7,8 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 import time as time
 
-def entrenar(n_mensajes, bits, epochs, batch_size, beta, gamma):
-
-    adam_optimizer_rate = 0.001
+def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, beta, gamma):
+ 
     print("GENERANDO MENSAJES")
     mensajes = generar_mensajes(n_mensajes, bits)
 

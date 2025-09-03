@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def draw_graph(diccionario_medidas):
+def draw_graph(diccionario_medidas, n_mensajes, nombre_figura):
 
     list_epochs = diccionario_medidas["epochs"]
     list_training_times = diccionario_medidas["training_times"]
@@ -22,6 +22,8 @@ def draw_graph(diccionario_medidas):
     plt.xlabel("Número de epochs")
     plt.ylabel("Duración del entrenamiento (s)")
     plt.title("Epochs - Entrenamiento")
+    plt.xlim(left = 0)
+    plt.ylim(bottom = 0)
     
     plt.subplot(2, 2, 2)
     plt.plot(list_epochs, list_precisiones_bob, c="red", label = "Prec Bob", marker='o', markersize=3, markerfacecolor="red")
@@ -31,6 +33,7 @@ def draw_graph(diccionario_medidas):
     plt.ylabel("Media precisión descifrado")
     plt.title("Epochs - Precisión media")
     plt.legend()
+    plt.xlim(left = 0)
 
     plt.subplot(2, 2, 3)
     plt.plot(list_epochs, list_distancias_hamming_bob, c="red", label = "Dists. Bob", marker='o', markersize=3, markerfacecolor="red")
@@ -40,6 +43,8 @@ def draw_graph(diccionario_medidas):
     plt.ylabel("Media distancias de Hamming")
     plt.title("Epochs - Distancias de Hamming")
     plt.legend()
+    plt.xlim(left = 0)
+    plt.ylim(bottom = 0)
 
     plt.subplot(2, 2, 4)
     plt.plot(list_epochs, list_reconstrucciones_perfectas_bob, c="red", label = "Perfectas Bob", marker='o', markersize=3, markerfacecolor="red")
@@ -49,8 +54,12 @@ def draw_graph(diccionario_medidas):
     plt.ylabel("Reconstrucciones perfectas")
     plt.title("Epochs - Reconstrucciones perfectas")
     plt.legend()
+    plt.xlim(left = 0)
+    plt.ylim(0, n_mensajes)
 
-    plt.show()
+    plt.subplots_adjust(left = 0.125, bottom = 0.11, right = 1.1, top = 0.9, wspace = 0.44, hspace = 0.45)
+    plt.savefig(nombre_figura + ".png", bbox_inches='tight', dpi = 300)
+    plt.close()
 
 
 

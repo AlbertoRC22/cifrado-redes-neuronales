@@ -7,9 +7,8 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 import time as t
 
-def entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma):
+def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, beta, gamma):
     
-    adam_optimizer_rate = 0.001
     print("GENERANDO MENSAJES")
     mensajes = generar_mensajes(n_mensajes, bits)
 
@@ -34,16 +33,19 @@ def entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma):
     bob_bien = bob([cifrado, claves_input])
     bob_err = bob([cifrado, claves_erroneas])
 
+    eve.trainable = False
+    eve_adv = eve(cifrado)
+
     model_ab = Model(
         inputs  = [mensajes_input, claves_input, claves_erroneas],
-        outputs = [bob_bien, bob_err]
+        outputs = [bob_bien, bob_err, eve_adv]
     )
     
     # Se especifican dos funciones de pérdida diferentes
     model_ab.compile(
         optimizer    = Adam(adam_optimizer_rate),
-        loss         = ['binary_crossentropy','binary_crossentropy'],
-        loss_weights = [gamma, beta]
+        loss         = ['binary_crossentropy','binary_crossentropy','binary_crossentropy'],
+        loss_weights = [gamma, beta, alfa]
     )
 
     mejor_loss = float('inf')
@@ -54,20 +56,22 @@ def entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma):
         idx = np.random.permutation(n_mensajes)[:batch_size]
         mensajes_batch = mensajes[idx]
         claves_batch = claves[idx]
-        claves_dummy = np.random.randint(0,2,(batch_size,bits)).astype(np.float32)
-        y_estimada = np.zeros_like(mensajes_batch)  # Así obligamos a Bob a fallar
-
-        resultados = model_ab.train_on_batch(
-            [mensajes_batch, claves_batch, claves_dummy],
-            [mensajes_batch, y_estimada]
-        )
-        # Recuperamos las losses, la de loss_bob y loss_bob_errores
-        _, loss_bob, loss_bob_errores = resultados
 
         cifrado_batch = alice.predict([mensajes_batch, claves_batch])
         loss_eve = eve.train_on_batch(cifrado_batch, mensajes_batch)
 
-        loss_total = gamma * loss_bob + beta * loss_bob_errores - alfa * loss_eve
+        claves_dummy = np.random.randint(0,2,(batch_size,bits)).astype(np.float32)
+        y_estimada = np.zeros_like(mensajes_batch)
+
+        y_eve_invertida = 1. - mensajes_batch
+
+        resultados = model_ab.train_on_batch(
+            [mensajes_batch, claves_batch, claves_dummy],
+            [mensajes_batch, y_estimada, y_eve_invertida]
+        )
+        # Recuperamos las losses
+        loss_total, loss_bob, loss_bob_errores, loss_eve_invertida = resultados
+        # Ese loss_total es gamma * loss_bob + beta * loss_bob_errores + alfa *loss_eve_invertida
         
         if loss_total < mejor_loss:
             mejor_loss = loss_total
@@ -93,6 +97,7 @@ def entrenar(n_mensajes, bits, epochs, batch_size, alfa, beta, gamma):
             f"loss_bob={loss_bob:.4f} | "
             f"loss_bob_errores={loss_bob_errores:.4f} | "
             f"loss_eve={loss_eve:.4f} | "
+            f"loss_eve_inv={loss_eve_invertida:.4f}"
         )
     time = t.time() - time_0
     return time
