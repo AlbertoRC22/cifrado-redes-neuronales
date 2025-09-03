@@ -18,4 +18,4 @@ En este caso se modelan varios escenarios de Alice y Bob con un atacante:
     - 2.2 Alice y Bob no entrenan junto a Eve
     - 2.3 Alice y Bob entrenan junto a Eve, pero eliminamos su influencia
 
-La carpeta resultados_finales tiene las gráfica sy resultados textuales generados en casa escenario.
+La carpeta resultados_finales tiene las gráficas y resultados textuales generados en casa escenario.
