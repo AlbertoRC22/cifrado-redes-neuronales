@@ -18,9 +18,9 @@ if __name__ == '__main__':
     total_epochs = 6000
     batch_size = 512
     adam_optimizer = 0.001
-    alfa = 1.0
-    beta = 2.0
-    gamma = 7.0
+    alfa = 0.1
+    beta = 0.2
+    gamma = 0.7
     muestras = 10
 
     with open(res_file_name, "a") as f:
