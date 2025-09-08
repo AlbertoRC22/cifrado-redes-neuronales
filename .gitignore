@@ -18,10 +18,10 @@ __pycache__/
 *.txt
 
 # Excepción: La carpeta de resultados
-!imagenes/
-!imagenes/**/
-!imagenes/**/*.png
-!imagenes/**/*.txt
+!resultados_finales/
+!resultados_finales/**/
+!resultados_finales/**/*.png
+!resultados_finales/**/*.txt
 
 2.3.\ alice_bob_eve\ (alfa\ =\ 0)
 2.4.\ alice_bob_eve\ (cifrados)/
