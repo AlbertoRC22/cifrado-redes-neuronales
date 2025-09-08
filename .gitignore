@@ -23,6 +23,7 @@ __pycache__/
 !imagenes/**/*.png
 !imagenes/**/*.txt
 
+2.3.\ alice_bob_eve\ (alfa\ =\ 0)
 2.4.\ alice_bob_eve\ (cifrados)/
 2.5.\ alice_bob_eve\ (texto\ plano)/
 2.6.\ alice_bob_mallory\ (clave)/
