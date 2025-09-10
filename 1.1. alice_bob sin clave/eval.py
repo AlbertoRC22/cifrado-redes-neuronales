@@ -4,30 +4,21 @@ import numpy as np
 
 from data_utils import generar_mensajes
 
-def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
-    print("CARGANDO MODELOS")
+def cargar_modelos(bits):
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
 
-    # Se cargan los pesos del entrenamiento anterior
     alice.load_weights('modelo_alice.keras')
     bob.load_weights('modelo_bob.keras')
 
-    print("GENERANDO MENSAJES")
-    mensajes = generar_mensajes(n_mensajes, bits)
-    
-    # Se cogen los mensajes y se generan las claves para tener suficientes
-    print("CIFRANDO Y DESCIFRANDO")
-    cifrados = alice.predict(mensajes)
-    reconstruidos = bob.predict(cifrados)
+    return alice, bob
 
-    with open(res_file_name, "a") as f:
-        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+def analizar_resultados(muestras, res_file_name, mensajes, reconstruidos):
     
     precisiones = []
     distancias = []
     reconstrucciones_perfectas = 0
-
+    
     for i in range(len(reconstruidos)):
         
         original = mensajes[i].astype(int)
@@ -52,6 +43,26 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
         distancias.append(distancia_hamming)
         if distancia_hamming == 0:
             reconstrucciones_perfectas += 1
+    
+    return precisiones, distancias, reconstrucciones_perfectas
+
+def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
+    
+    # Cargamos los modelos y los pesos del entrenamiento anterior
+    alice, bob = cargar_modelos(bits)
+
+    # Generamos los mensajes
+    mensajes = generar_mensajes(n_mensajes, bits)
+    
+    # Se cogen los mensajes y se generan las claves para tener suficientes
+    print("CIFRANDO Y DESCIFRANDO")
+    cifrados = alice.predict(mensajes)
+    reconstruidos = bob.predict(cifrados)
+
+    with open(res_file_name, "a") as f:
+        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+
+    precisiones, distancias, reconstrucciones_perfectas = analizar_resultados(muestras, res_file_name, mensajes, reconstruidos)
     
     media_precision = np.mean(precisiones)
     media_distancias = np.mean(distancias)
