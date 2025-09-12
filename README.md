@@ -18,3 +18,4 @@ En este caso se modelan varios escenarios de Alice y Bob con un atacante:
     - 2.2 Alice y Bob no entrenan junto a Eve
 
 La carpeta resultados_finales tiene las gráficas y resultados textuales generados en cada escenario.
+La carpeta jupyter contiene las Jupyter Notebooks de cada escenario.
