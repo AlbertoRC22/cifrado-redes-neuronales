@@ -41,6 +41,6 @@ En este caso, basta con utilizar el terminal para situarse en el subdirectorio c
 
 ## Ejecución con las Jupyter Notebooks
 
-Hecho eso, hay que dirigirse al directorio raíz o al diretorio jupyter en una terminal para ejeuctar ahí el comando "jupyter notebook", lo que abrirá una interfaz gráfica en la que se tendrá acceso a todas las notebooks y con la que se podrán tanto ejecutar como modificar.
+Hay que dirigirse al directorio raíz o al directorio jupyter en una terminal para ejecutar ahí el comando "jupyter notebook", lo que abrirá una interfaz gráfica en la que se tendrá acceso a todas las notebooks y con la que se podrán tanto ejecutar como modificar.
 
 
