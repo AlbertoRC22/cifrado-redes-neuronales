@@ -3,8 +3,8 @@ from models import crear_modelo_alice, crear_modelo_bob
 import numpy as np
 from data_utils import generar_mensajes
 
-def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
-    print("CARGANDO MODELOS")
+def cargar_modelos(bits):
+    # Cargamos los modelos y los pesos del entrenamiento anterior
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
 
@@ -12,18 +12,17 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
     alice.load_weights('modelo_alice_key.keras')
     bob.load_weights('modelo_bob_key.keras')
 
-    print("GENERANDO MENSAJES")
-    mensajes = generar_mensajes(n_mensajes, bits)
-    
-    # Se cogen los mensajes y se generan las claves para tener suficientes
-    print("CIFRANDO Y DESCIFRANDO")
+    return alice, bob
+
+def generar_cifrados(bits, alice, bob, mensajes):
     claves = np.random.randint(0, 2, size=(mensajes.shape[0], bits))
     cifrados = alice.predict([mensajes, claves])
     reconstruidos = bob.predict([cifrados, claves])
 
-    with open(res_file_name, "a") as f:
-        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
-    
+    return cifrados, reconstruidos
+
+def analizar_resultados(muestras, res_file_name, mensajes, reconstruidos):
+
     precisiones = []
     distancias = []
     reconstrucciones_perfectas = 0
@@ -52,19 +51,10 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
         distancias.append(distancia_hamming)
         if distancia_hamming == 0:
             reconstrucciones_perfectas += 1
-    
-    media_precision = np.mean(precisiones)
-    media_distancias = np.mean(distancias)
-    str_media_precision = f"La media de la precisión del descifrado es {media_precision:.4f}\n"
-    str_media_distancias = f"Distancia media de Hamming = {media_distancias:.4f} | Número de bits: {bits}\n"
-    str_reconstrucciones_perfectas = f"Número de reconstrucciones perfectas = {reconstrucciones_perfectas}\n"
-    str_medidas = str_media_precision + str_media_distancias + str_reconstrucciones_perfectas + "\n\n"
-    with open(res_file_name, "a") as f:
-        f.write(str_medidas)
 
-    
-    with open(res_file_name, "a") as f:
-        f.write('\n EVALUACIÓN DE BOB CON CLAVES ERRÓNEAS\n\n')
+    return precisiones, distancias, reconstrucciones_perfectas
+
+def analizar_resultados_claves_erroneas(bits, bob, muestras, res_file_name, mensajes, cifrados):
 
     precision_errores = []
     dist_errores = []
@@ -91,6 +81,39 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
         dist_errores.append(hamming_err)
         if(hamming_err == 0):
             reconstrucciones_perfectas_errores += 1
+    
+    return precision_errores, dist_errores, reconstrucciones_perfectas_errores
+
+def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
+
+    # Cargamos los modelos y los pesos del entrenamiento anterior
+    alice, bob = cargar_modelos(bits)
+
+    # Generamos los mensajes
+    mensajes = generar_mensajes(n_mensajes, bits)
+    
+    # Se cogen los mensajes y se cifran con las claves suficientes
+    cifrados, reconstruidos = generar_cifrados(bits, alice, bob, mensajes)
+
+    with open(res_file_name, "a") as f:
+        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+    
+    precisiones, distancias, reconstrucciones_perfectas = analizar_resultados(muestras, res_file_name, mensajes, reconstruidos)
+    
+    media_precision = np.mean(precisiones)
+    media_distancias = np.mean(distancias)
+    str_media_precision = f"La media de la precisión del descifrado es {media_precision:.4f}\n"
+    str_media_distancias = f"Distancia media de Hamming = {media_distancias:.4f} | Número de bits: {bits}\n"
+    str_reconstrucciones_perfectas = f"Número de reconstrucciones perfectas = {reconstrucciones_perfectas}\n"
+    str_medidas = str_media_precision + str_media_distancias + str_reconstrucciones_perfectas + "\n\n"
+    with open(res_file_name, "a") as f:
+        f.write(str_medidas)
+
+    
+    with open(res_file_name, "a") as f:
+        f.write('\n EVALUACIÓN DE BOB CON CLAVES ERRÓNEAS\n\n')
+
+    precision_errores, dist_errores, reconstrucciones_perfectas_errores = analizar_resultados_claves_erroneas(bits, bob, muestras, res_file_name, mensajes, cifrados)
 
     media_precision_errores = np.mean(precision_errores)
     media_distancia_errores = np.mean(dist_errores)

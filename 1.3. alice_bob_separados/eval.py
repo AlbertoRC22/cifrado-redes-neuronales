@@ -3,26 +3,26 @@ from tensorflow.keras.models import load_model
 from models import crear_modelo_alice, crear_modelo_bob
 from data_utils import generar_mensajes
 
-def evaluar(bits, muestras, res_file_name, epochs):
-    print("CARGANDO MODELOS")
+def cargar_modelos(bits):
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
 
     alice.load_weights('modelo_alice_separado.keras')
     bob.load_weights('modelo_bob_separado.keras')
 
-    print("GENERANDO MENSAJES")
-    mensajes = generar_mensajes(n=muestras, bits=bits)
+    return alice, bob
 
+def generar_cifrados(bits, alice, bob, mensajes):
     clave_fija = np.random.randint(0, 2, size=(1, bits)).astype(np.float32)
     claves = np.repeat(clave_fija, mensajes.shape[0], axis=0)
 
     cifrados = alice.predict([mensajes, claves])
     reconstruidos = bob.predict([cifrados, claves])
 
-    with open(res_file_name, "a") as f:
-        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
-    
+    return reconstruidos
+
+def analizar_resultados(muestras, res_file_name, mensajes, reconstruidos):
+
     precisiones = []
     distancias = []
     reconstrucciones_perfectas = 0
@@ -48,7 +48,23 @@ def evaluar(bits, muestras, res_file_name, epochs):
         distancias.append(distancia_hamming)
         if distancia_hamming == 0:
             reconstrucciones_perfectas += 1
-    
+
+    return precisiones, distancias, reconstrucciones_perfectas
+
+def evaluar(bits, muestras, res_file_name, epochs):
+    # Cargamos los modelos y los pesos del entrenamiento anterior
+    alice, bob = cargar_modelos(bits)
+
+    print("GENERANDO MENSAJES")
+    mensajes = generar_mensajes(n=muestras, bits=bits)
+
+    reconstruidos = generar_cifrados(bits, alice, bob, mensajes)
+
+    with open(res_file_name, "a") as f:
+        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+
+    precisiones, distancias, reconstrucciones_perfectas = analizar_resultados(muestras, res_file_name, mensajes, reconstruidos)
+
     media_precision = np.mean(precisiones)
     media_distancias = np.mean(distancias)
 

@@ -6,10 +6,9 @@ from tensorflow.keras.regularizers import l2
 def crear_modelo_alice(bits):
     input_msg = Input(shape=(bits,), name='mensaje_original') # Se define la entrada, que es el mensaje
 
-    input_key = Input(shape=(bits,), name='clave_simetrica') # Si hay clave, también la recibe
+    input_key = Input(shape=(bits,), name='clave_simetrica') # También recibe la clave
     x = Concatenate()([input_msg, input_key]) # Juntamos clave y mensaje para usarlo de input
     final_input = [input_msg, input_key]
-
 
     # Va a tener dos capas, con 128 y 64 neuronas, respectivamente
     # Reciebn como entrada los mensajes/mensajes y claves 

@@ -14,7 +14,7 @@ if __name__ == '__main__':
     muestras = 10
     
     step = 300
-    total_epochs = 6000
+    total_epochs = 600
 
     nombre_figura_base = f"Figura 12 - Batch size = "
 

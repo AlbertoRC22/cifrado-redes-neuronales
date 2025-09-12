@@ -10,7 +10,7 @@ def crear_modelo_alice(bits):
     final_input = input_msg
 
     # Va a tener dos capas, con 128 y 64 neuronas, respectivamente
-    # Reciebn como entrada los mensajes/mensajes y claves 
+    # Reciben como entrada los mensajes/mensajes y claves 
     # Dense significa que las neuronas reciben como entrada toda la entrada anterior
     x = Dense(128, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
@@ -31,6 +31,6 @@ def crear_modelo_bob(bits):
     x = Dense(64, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
 
-    # Uso de la función sigmoide para reconstruir los mensajes porque es bianria
+    # Uso de la función sigmoide para reconstruir los mensajes porque es binaria
     reconstruido = Dense(bits, activation='sigmoid')(x)
     return Model(final_input, reconstruido, name='Bob')

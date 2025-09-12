@@ -7,28 +7,39 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 import time as t
 
-def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, beta, gamma):
-    
-    print("GENERANDO MENSAJES")
+def generar_claves_y_mensajes(n_mensajes, bits):
+    # Generando mensajes
     mensajes = generar_mensajes(n_mensajes, bits)
 
-    print("GENERANDO CLAVES")
+    # Generando claves
     claves = np.random.randint(0, 2, (n_mensajes, bits)).astype(np.float32)
 
-    print("INSTANCIANDO MODELOS")
+    return mensajes, claves
+
+def crear_modelos(bits):
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
     eve = crear_modelo_eve(bits)
 
-    # Compilamos a Eve (solo un loss)
+    return alice, bob, eve
+
+
+def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, beta, gamma):
+    
+    mensajes, claves = generar_claves_y_mensajes(n_mensajes, bits)
+
+    # Creando los modelos
+    alice, bob, eve = crear_modelos(bits)
+
+    # Compilamos a Eve (solo una loss)
     eve.compile(optimizer=Adam(adam_optimizer_rate), loss='binary_crossentropy')
    
     mensajes_input = alice.input[0]
     claves_input = alice.input[1]
-    claves_erroneas = Input(shape=(bits,), name='clave_err') # Se define que las claves son un tensor de ese tamaño
+    claves_erroneas = Input(shape=(bits,), name='clave_err') 
 
     # Construimos Alice, Bob e Eve con las entradas correspondientes
-    # Nótese que hay 2 Bobs
+    # Nótese que hay 2 Bobs, para segurarnos de que Bob descifra con claves correctas
     cifrado = alice([mensajes_input, claves_input])
     bob_bien = bob([cifrado, claves_input])
     bob_err = bob([cifrado, claves_erroneas])
@@ -41,7 +52,7 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, be
         outputs = [bob_bien, bob_err, eve_adv]
     )
     
-    # Se especifican dos funciones de pérdida diferentes
+    # Se especifican tres funciones de pérdida diferentes
     model_ab.compile(
         optimizer    = Adam(adam_optimizer_rate),
         loss         = ['binary_crossentropy','binary_crossentropy','binary_crossentropy'],

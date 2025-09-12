@@ -54,8 +54,7 @@ def evaluar(n_mensajes, bits, muestras, res_file_name, epochs):
     # Generamos los mensajes
     mensajes = generar_mensajes(n_mensajes, bits)
     
-    # Se cogen los mensajes y se generan las claves para tener suficientes
-    print("CIFRANDO Y DESCIFRANDO")
+    # Se cifran y descifran los mensajes
     cifrados = alice.predict(mensajes)
     reconstruidos = bob.predict(cifrados)
 

@@ -5,16 +5,20 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 import time as t
 
-def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
-
-    # Se genera una clave para cifrar todos los mensajes, ya que se entrenan por separado
-    print("Usando clave fija")
+def generar_mensajes_y_clave(n_mensajes, bits): 
+    # Para simplificar por tener entrenamiento separado, se genera una sola clave
     clave_fija = np.random.randint(0, 2, size=(1, bits)).astype(np.float32)
-
-    print("Generando mensajes")
+    
+    # Generamos los mensajes
     mensajes = generar_mensajes(n_mensajes, bits)
+    
+    return clave_fija, mensajes
 
-    print("Entrenando ALICE")
+def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
+    # Generamos una única clave y los mensajes
+    clave_fija, mensajes = generar_mensajes_y_clave(n_mensajes, bits)
+
+    # Entrenamiento de Alice
     alice = crear_modelo_alice(bits, key=True)
     alice.compile(optimizer=Adam(adam_optimizer), loss=BinaryCrossentropy())
 
@@ -29,14 +33,14 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
 
         print(f"Época {epoch+1} Alice")
 
-    print("Guardando modelo de Alice")
+    # Guardamos el modelo de Alice
     alice.save("modelo_alice_separado.keras")
 
-    print("Generando cifrados con Alice entrenada")
+    # Ahora generamos los cifrados que Bob tendrá que aprender a descifrar
     claves_completas = np.repeat(clave_fija, n_mensajes, axis=0)
     cifrados = alice.predict([mensajes, claves_completas])
 
-    print("Entrenando BOB")
+    # Instanciamos y entrenamos a Bob
     bob = crear_modelo_bob(bits, key=True)
     bob.compile(optimizer=Adam(adam_optimizer), loss=BinaryCrossentropy())
 
@@ -45,7 +49,7 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
         cifrados_batch = cifrados[idx]
         mensajes_batch = mensajes[idx]
 
-        # Repite la clave para usar la misma en todo el lote
+        # Repite la clave para usar la misma en todo el batch
         claves_batch = np.repeat(clave_fija, batch_size, axis=0)
 
         bob.train_on_batch([cifrados_batch, claves_batch], mensajes_batch)
@@ -54,7 +58,7 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer):
         acc = np.mean((reconstruidos > 0.5).astype(int) == mensajes_batch)
         print(f"Época {epoch+1} Bob - Precisión del descifrado: {acc:.3f}")
 
-    print("Guardando modelo de Bob")
+    # Guardamos el modelo de Bob
     bob.save("modelo_bob_separado.keras")
 
     time = t.time() - time_0

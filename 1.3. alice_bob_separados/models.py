@@ -32,7 +32,7 @@ def crear_modelo_bob(bits, key=True):
     x = Dense(64, activation='relu')(x)
     x = Dense(64, activation='relu')(x)
 
-    # Uso de la función sigmoide para reconstruir los mensajes porque es bianria
+    # Uso de la función sigmoide para reconstruir los mensajes porque es binaria
     reconstruido = Dense(bits, activation='sigmoid')(x)
 
     return Model([input_cifrado, input_key], reconstruido, name='Bob')
