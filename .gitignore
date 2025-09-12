@@ -28,7 +28,7 @@ __pycache__/
 2.5.\ alice_bob_eve\ (texto\ plano)/
 2.6.\ alice_bob_mallory\ (clave)/
 jupyter/.ipynb_checkpoints/
-jupyter/.test.ipynb
+jupyter/test.ipynb
 
 and_or_xor.py
 graphs.py
