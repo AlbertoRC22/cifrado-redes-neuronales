@@ -23,6 +23,32 @@ def crear_modelos(bits):
 
     return alice, bob, eve
 
+def generar_batch(n_mensajes, batch_size, mensajes, claves):
+    idx = np.random.permutation(n_mensajes)[:batch_size]
+    mensajes_batch = mensajes[idx]
+    claves_batch = claves[idx]
+
+    return mensajes_batch, claves_batch
+
+def actualizar_mejor_loss(alice, bob, eve, loss_total, epoch):
+    mejor_loss = loss_total
+    alice.save('modelo_alice.keras')
+    bob.save('modelo_bob.keras')
+    eve.save('modelo_eve.keras')
+    print(f"Modelos guardados en epoch {epoch+1} (loss_total={loss_total:.4f})")
+    
+    return mejor_loss
+
+def toma_de_medidas(mensajes_batch, cifrado_batch, claves_batch, claves_dummy, bob, eve):
+
+    prediccion_bob = (bob.predict([cifrado_batch, claves_batch]) > 0.5).astype(int)
+    prediccion_errores = (bob.predict([cifrado_batch, claves_dummy]) > 0.5).astype(int)
+
+    precision_bob = np.mean(prediccion_bob  == mensajes_batch)
+    precision_errores = np.mean(prediccion_errores == mensajes_batch)
+    precision_eve = np.mean((eve.predict(cifrado_batch) > 0.5).astype(int) == mensajes_batch)
+
+    return precision_bob, precision_errores, precision_eve
 
 def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, beta, gamma):
     
@@ -44,9 +70,12 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, be
     bob_bien = bob([cifrado, claves_input])
     bob_err = bob([cifrado, claves_erroneas])
 
+    # Vital para entrenamiento adversarial
     eve.trainable = False
     eve_adv = eve(cifrado)
 
+    # Creamos y compilamos el modelo conjunto
+    # Creamos el modelo conjunto
     model_ab = Model(
         inputs  = [mensajes_input, claves_input, claves_erroneas],
         outputs = [bob_bien, bob_err, eve_adv]
@@ -64,13 +93,15 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, be
     time_0 = t.time()
     for epoch in range(epochs):
         
-        idx = np.random.permutation(n_mensajes)[:batch_size]
-        mensajes_batch = mensajes[idx]
-        claves_batch = claves[idx]
+        # Generamos los mensajes y las claves de este batch
+        mensajes_batch, claves_batch = generar_batch(n_mensajes, batch_size, mensajes, claves)
 
+        # Genermaos los mensajes cifrados ya entrenamos a Eve
         cifrado_batch = alice.predict([mensajes_batch, claves_batch])
         loss_eve = eve.train_on_batch(cifrado_batch, mensajes_batch)
 
+        # Generamos claves dummy y lo que hay que estimar a partir de ellas.
+        # Con esto enseñaremos a Bob a cifrar mal si no tiene la clave correcta
         claves_dummy = np.random.randint(0,2,(batch_size,bits)).astype(np.float32)
         y_estimada = np.zeros_like(mensajes_batch)
 
@@ -82,23 +113,17 @@ def entrenar(n_mensajes, bits, epochs, batch_size, adam_optimizer_rate, alfa, be
         )
         # Recuperamos las losses
         loss_total, loss_bob, loss_bob_errores, loss_eve_invertida = resultados
-        # Ese loss_total es gamma * loss_bob + beta * loss_bob_errores + alfa *loss_eve_invertida
+        # Ese loss_total es gamma * loss_bob + beta * loss_bob_errores + alfa * loss_eve_invertida
+        # Por ese + alfa * loss_eve_invertida es que lo invertimos, para penalizar a Eve
         
+        # Actualizamos la pérdida, y los modelos, si esta ha mejorado
         if loss_total < mejor_loss:
-            mejor_loss = loss_total
-            alice.save('modelo_alice.keras')
-            bob.save('modelo_bob.keras')
-            eve.save('modelo_eve.keras')
-            print(f"Modelos guardados en epoch {epoch+1} (loss_total={loss_total:.4f})")
+            mejor_loss = actualizar_mejor_loss(alice, bob, eve, loss_total, epoch)
 
-        # Métricas de precisión que s eimprimen por epoch
-        prediccion_bob = (bob.predict([cifrado_batch, claves_batch]) > 0.5).astype(int)
-        prediccion_errores = (bob.predict([cifrado_batch, claves_dummy]) > 0.5).astype(int)
+        # Métricas de precisión que se imprimen por epoch
+        precision_bob, precision_errores, precision_eve = toma_de_medidas(mensajes_batch, cifrado_batch, claves_batch, claves_dummy, bob, eve)
 
-        precision_bob = np.mean(prediccion_bob  == mensajes_batch)
-        precision_errores = np.mean(prediccion_errores == mensajes_batch)
-        precision_eve = np.mean((eve.predict(cifrado_batch) > 0.5).astype(int) == mensajes_batch)
-
+        # Mostramos el avance de las medidas por epochs
         print(
             f"EPOCHS TOTALES = {epochs} |"
             f"[Epoch {epoch+1:03}] | "

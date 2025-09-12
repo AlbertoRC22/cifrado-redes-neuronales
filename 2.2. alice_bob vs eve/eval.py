@@ -3,8 +3,8 @@ from tensorflow.keras.models import load_model
 from models import crear_modelo_alice, crear_modelo_bob, crear_modelo_eve
 from data_utils import generar_mensajes
 
-def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
-    print("CARGANDO MODELOS")
+def crear_y_cargar_modelos(bits):
+    # Se instancian los modelos
     alice = crear_modelo_alice(bits)
     bob = crear_modelo_bob(bits)
     eve = crear_modelo_eve(bits)
@@ -14,19 +14,19 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
     bob.load_weights('modelo_bob.keras')
     eve.load_weights('modelo_eve.keras')
 
+    return alice, bob, eve
+
+def generar_mensajes_y_claves(n_mensajes, bits):
     mensajes = generar_mensajes(n_mensajes, bits).astype(np.float32)
     claves = np.random.randint(0, 2, size=(mensajes.shape[0], bits)).astype(np.float32)
 
-    # Tanto Bob como Eve intentan reconstruir
-    cifrados = alice.predict([mensajes, claves])
-    reconstruidos_bob = bob.predict([cifrados, claves])
-    reconstruidos_eve = eve.predict(cifrados)
+    return mensajes, claves
 
-    with open(res_file_name, "a") as f:
-        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+def analizar_resultados(mensajes, cifrados, reconstruidos_bob, reconstruidos_eve, muestras, res_file_name):
 
     precisiones_bob = []
     precisiones_eve = []
+    
     dist_bob = []
     dist_eve = []
 
@@ -64,25 +64,10 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
         
         if distancia_hamming_eve == 0:
             reconstrucciones_perfectas_eve += 1
+    
+    return precisiones_bob, precisiones_eve, dist_bob, dist_eve, reconstrucciones_perfectas_bob, reconstrucciones_perfectas_eve
 
-    media_precisiones_bob = np.mean(precisiones_bob)
-    media_precisiones_eve = np.mean(precisiones_eve)
-    media_distancias_bob = np.mean(dist_bob)
-    media_distancias_eve = np.mean(dist_eve)
-    str_titulo = "\nRESULTADOS FINALES\n\n"
-    str_precision_bob = f"Bob -> Precisión media: {media_precisiones_bob:.4f} | Hamming media: {media_distancias_bob:.2f}\n"
-    str_precision_eve = f"Eve -> Precisión media: {media_precisiones_eve:.4f} | Hamming media: {media_distancias_eve:.2f}\n"
-    str_reconstrucciones_perfectas = f"Bob -> Perfectas: {reconstrucciones_perfectas_bob} | Eve -> Perfectas: {reconstrucciones_perfectas_eve}\n"
-
-    str_resultados_finales = str_titulo + str_precision_bob + str_precision_eve + str_reconstrucciones_perfectas
-    with open(res_file_name, "a") as f:
-        f.write(str_resultados_finales)
-
-    # En este trozo se generan claves erradas y se intenta que Bob descifre con ellas
-    # Es lo mismo, pero con un set de claves nuevo
-    with open(res_file_name, "a") as f:
-        f.write("\nEVALUACIÓN CON CLAVES ERRÓNEAS PARA BOB\n\n")
-
+def analizar_resultados_errado(bob, bits, mensajes, cifrados, muestras, res_file_name):
     precisiones_bob_errado = []
     distancias_bob_errado = []
     reconstrucciones_perfectas_errado = 0
@@ -109,6 +94,57 @@ def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
 
         if(hamming_err == 0):
             reconstrucciones_perfectas_errado += 1
+    
+    return precisiones_bob_errado, distancias_bob_errado, reconstrucciones_perfectas_errado
+
+def evaluar(n_mensajes, bits, muestras, epochs, res_file_name):
+
+    # Cargamos y creamos los modelos
+    alice, bob, eve = crear_y_cargar_modelos(bits)
+
+    mensajes, claves = generar_mensajes_y_claves(n_mensajes, bits)
+
+    # Tanto Bob como Eve intentan reconstruir
+    cifrados = alice.predict([mensajes, claves])
+    reconstruidos_bob = bob.predict([cifrados, claves])
+    reconstruidos_eve = eve.predict(cifrados)
+
+    with open(res_file_name, "a") as f:
+        f.write(f"\nEVALUACIÓN CON {epochs}:\n\n")
+    
+    (
+        precisiones_bob, 
+        precisiones_eve, 
+        dist_bob, 
+        dist_eve, 
+        reconstrucciones_perfectas_bob, 
+        reconstrucciones_perfectas_eve
+    ) = analizar_resultados(mensajes, cifrados, reconstruidos_bob, reconstruidos_eve, muestras, res_file_name)
+
+    media_precisiones_bob = np.mean(precisiones_bob)
+    media_precisiones_eve = np.mean(precisiones_eve)
+    media_distancias_bob = np.mean(dist_bob)
+    media_distancias_eve = np.mean(dist_eve)
+    str_titulo = "\nRESULTADOS FINALES\n\n"
+    str_precision_bob = f"Bob -> Precisión media: {media_precisiones_bob:.4f} | Hamming media: {media_distancias_bob:.2f}\n"
+    str_precision_eve = f"Eve -> Precisión media: {media_precisiones_eve:.4f} | Hamming media: {media_distancias_eve:.2f}\n"
+    str_reconstrucciones_perfectas = f"Bob -> Perfectas: {reconstrucciones_perfectas_bob} | Eve -> Perfectas: {reconstrucciones_perfectas_eve}\n"
+
+    str_resultados_finales = str_titulo + str_precision_bob + str_precision_eve + str_reconstrucciones_perfectas
+    with open(res_file_name, "a") as f:
+        f.write(str_resultados_finales)
+
+    # En este trozo se generan claves erradas y se intenta que Bob descifre con ellas
+    # Es lo mismo, pero con un set de claves nuevo
+    with open(res_file_name, "a") as f:
+        f.write("\nEVALUACIÓN CON CLAVES ERRÓNEAS PARA BOB\n\n")
+
+
+    (
+        precisiones_bob_errado, 
+        distancias_bob_errado, 
+        reconstrucciones_perfectas_errado
+    ) = analizar_resultados_errado(bob, bits, mensajes, cifrados, muestras, res_file_name)
 
     media_precisiones_bob_errado = np.mean(precisiones_bob_errado)
     media_distancias_bob_errado = np.mean(distancias_bob_errado)
