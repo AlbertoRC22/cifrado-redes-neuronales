@@ -12,7 +12,7 @@ Hay tres casos:
 
 ## 2. Alice y Bob con atacante
 
-En este caso se modelan varios escenarios de Alice y Bob con un atacante:
+En este caso se modelan dos escenarios de Alice y Bob con un atacante:
  
 * 2.1 Alice Y Bob entrenan junto a Eve
 * 2.2 Alice y Bob no entrenan junto a Eve
